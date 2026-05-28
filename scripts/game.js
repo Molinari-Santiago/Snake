@@ -1,5 +1,5 @@
-// game.js — Snake Romano (Resolución interna fija, safe start logic)
-const COLS = 36, ROWS = 28;
+// game.js — Snake Romano (Resolución dinámica por nivel, Ouroboros)
+let COLS = 20, ROWS = 16;
 const CELL = 20;
 
 const game = {
@@ -11,7 +11,7 @@ const game = {
     snake1: null, snake2: null,
     food1: null,  food2: null,
     flashTimer: 0, flashMsg: '',
-    hasStartedMoving: false, // <-- Safe start flag
+    hasStartedMoving: false,
 
     get activeSnake() { return this.currentPlayer === 1 ? this.snake1 : this.snake2; },
     get activeFood()  { return this.currentPlayer === 1 ? this.food1 : this.food2; },
@@ -19,10 +19,7 @@ const game = {
     init() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx    = this.canvas.getContext('2d');
-        // Resolucion interna FIJA. El CSS escala el lienzo visualmente.
-        this.canvas.width  = COLS * CELL; // 720
-        this.canvas.height = ROWS * CELL; // 560
-
+        
         this.snake1 = new Snake(1, 8, Math.floor(ROWS/2), DIR.RIGHT, '#3a9e3a','#1a5e1a','#2ecc71','Italia','🇮🇹');
         this.snake2 = new Snake(2, COLS-9, Math.floor(ROWS/2), DIR.LEFT, '#5ba8f5','#1a4aaa','#3498db','Argentina','🇦🇷');
         this.food1  = new Food('🍕','#e74c3c');
@@ -48,10 +45,33 @@ const game = {
     startTurn(playerNum) {
         this.currentPlayer = playerNum;
         this.level = 0;
-        this.hasStartedMoving = false; // <-- El jugador debe presionar una tecla para empezar
+        this.activeSnake.reset(); // Reinicia la serpiente completamente (largo, score si se quiere, etc)
+        // Pero no resetea el score de la partida completa que está en game.js o snake.score
+        // Wait, snake.reset() DOES reset score! Let's check snake.js.
+        // I will preserve the score!
+        const preservedScore = this.activeSnake.score;
         this.activeSnake.reset();
+        this.activeSnake.score = preservedScore;
+
+        this.startLevel();
+        this.setState('PLAYING');
         
-        // Empezar en el centro del mapa
+        document.getElementById('panel1').classList.toggle('active', playerNum === 1);
+        document.getElementById('panel2').classList.toggle('active', playerNum === 2);
+    },
+
+    startLevel() {
+        this.hasStartedMoving = false;
+        
+        const lvlCfg = SNAKE_LEVELS[this.level];
+        COLS = lvlCfg.cols;
+        ROWS = lvlCfg.rows;
+        this.canvas.width = COLS * CELL;
+        this.canvas.height = ROWS * CELL;
+        this.canvas.parentElement.style.aspectRatio = `${COLS} / ${ROWS}`;
+
+        // Conservamos vida y reseteamos posicion
+        this.activeSnake.alive = true;
         this.activeSnake.body = [
             { x: Math.floor(COLS/2),   y: Math.floor(ROWS/2) },
             { x: Math.floor(COLS/2)-1, y: Math.floor(ROWS/2) },
@@ -63,14 +83,10 @@ const game = {
         
         this.activeFood.spawn(COLS, ROWS, this.activeSnake, this.activeSnake);
         this.accumulator = 0; 
-        this.lastTime = 0;
-        this.setState('PLAYING');
-        this.updateHUD();
-        this.flash(`¡Turno de ${this.activeSnake.flag} ${this.activeSnake.name}!`);
+        if (this.state !== 'PLAYING') this.lastTime = 0;
         
-        // Actualizar visual de paneles
-        document.getElementById('panel1').classList.toggle('active', playerNum === 1);
-        document.getElementById('panel2').classList.toggle('active', playerNum === 2);
+        this.updateHUD();
+        this.flash(`Nivel ${this.level+1}: ${lvlCfg.label}`);
     },
 
     resetGame() { this.startGame(); },
@@ -95,12 +111,22 @@ const game = {
     },
 
     tick() {
-        if (!this.hasStartedMoving) return; // No mover hasta que presione una tecla
+        if (!this.hasStartedMoving) return; 
 
         const snake = this.activeSnake;
-        // Guardamos la posicion anterior para la animacion fluida
         snake.previousBody = snake.body.map(s => ({...s}));
         snake.move();
+
+        const head = snake.head;
+        const tail = snake.body[snake.body.length - 1]; 
+        
+        // Ouroboros: Si la cabeza entra en la posición de la cola, gana el nivel (si tiene tamaño suficiente)
+        const ateTail = (head.x === tail.x && head.y === tail.y) && snake.body.length > 4;
+
+        if (ateTail) {
+            this.winLevel();
+            return;
+        }
 
         if (checkWallCollision(snake, COLS, ROWS) || checkSelfCollision(snake)) {
             this.killActiveSnake();
@@ -118,12 +144,31 @@ const game = {
         snake.trimTail();
         food.update();
 
-        const target = SNAKE_LEVELS[this.level].minLength + (this.level+1)*3;
-        if (snake.body.length >= target && this.level < SNAKE_LEVELS.length - 1) {
-            this.level++;
-            this.flash(`⚔️ ¡Nivel ${this.level+1}: ${SNAKE_LEVELS[this.level].label}!`);
-        }
         this.updateHUD();
+    },
+
+    winLevel() {
+        this.activeSnake.score += 500; // Bonus por cerrar el ciclo
+        this.level++;
+        if (this.level >= SNAKE_LEVELS.length) {
+            this.activeSnake.alive = false;
+            saveScore(this.activeSnake.name+' '+this.activeSnake.flag, this.activeSnake.score, this.level);
+            
+            if (this.currentPlayer === 1) {
+                this.setState('TURN_OVER');
+                document.getElementById('pauseTitle').textContent = '🏆 ¡ITALIA COMPLETÓ EL JUEGO!';
+                document.getElementById('pauseSubtitle').textContent = `Puntos: ${this.activeSnake.score}. ¡Le toca a Argentina!`;
+                const btn = document.getElementById('pauseBtn');
+                btn.textContent = '▶ TURNO DE ARGENTINA';
+                btn.onclick = () => this.startTurn(2);
+                document.getElementById('pauseRestartBtn').style.display = 'none';
+            } else {
+                this.triggerGameOver();
+            }
+        } else {
+            this.flash(`🏆 ¡Nivel completado!`);
+            this.startLevel();
+        }
     },
 
     killActiveSnake() {
@@ -160,7 +205,25 @@ const game = {
     updateHUD() {
         document.getElementById('p1Score').textContent = this.snake1.score;
         document.getElementById('p2Score').textContent = this.snake2.score;
-        document.getElementById('levelBar').textContent = `Nivel ${this.level+1} — ${SNAKE_LEVELS[this.level].label}`;
+        const lvlCfg = SNAKE_LEVELS[Math.min(this.level, SNAKE_LEVELS.length-1)];
+        const elBar = document.getElementById('levelBar');
+        if (elBar) elBar.textContent = `Nivel ${this.level+1} — ${lvlCfg.label}`;
+
+        // Divs de niveles
+        for (let i = 1; i <= 5; i++) {
+            const el = document.getElementById('slvl' + i);
+            if (el) {
+                if (i - 1 === this.level) {
+                    el.style.color = '#FFD700';
+                    el.style.borderColor = '#c9a227';
+                    el.style.boxShadow = '0 0 5px #c9a227';
+                } else {
+                    el.style.color = '#8b7355';
+                    el.style.borderColor = '#5c3a1e';
+                    el.style.boxShadow = 'none';
+                }
+            }
+        }
     },
 
     render() {
@@ -170,10 +233,9 @@ const game = {
         drawBackground(ctx, COLS, ROWS, CELL);
         drawBorder(ctx, COLS, ROWS, CELL);
         
-        // Calcular progreso para interpolar animación (0.0 a 1.0)
         let progress = this.accumulator / this.stepMs;
         if (progress > 1) progress = 1;
-        if (!this.hasStartedMoving || this.state !== 'PLAYING') progress = 1; // Si esta en pausa, no animar intermedio
+        if (!this.hasStartedMoving || this.state !== 'PLAYING') progress = 1;
         
         if (this.currentPlayer === 1) {
             drawFood(ctx, this.food1, CELL);
@@ -185,7 +247,6 @@ const game = {
             else drawDead(ctx, this.snake2, CELL);
         }
 
-        // Indicador visual de que debe presionar para moverse
         if (!this.hasStartedMoving && this.state === 'PLAYING') {
             ctx.save();
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -212,5 +273,5 @@ const game = {
     }
 };
 
-window.game = game; // Export global
+window.game = game; 
 window.addEventListener('load', () => game.init());

@@ -9,6 +9,7 @@ function checkSelfCollision(snake) {
     return snake.body.slice(1).some(s => s.x === h.x && s.y === h.y);
 }
 
+
 function checkSnakeVsSnake(s1, s2) {
     // Verifica si la cabeza de s1 choca con el cuerpo de s2 (y viceversa)
     const h1 = s1.head, h2 = s2.head;
