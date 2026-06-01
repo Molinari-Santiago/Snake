@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 // levels.js — Configuración de los 7 niveles del Snake Romano
 // Cada objeto controla dificultad, tamaño del mapa y etiqueta que se muestra en pantalla.
+=======
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 const SNAKE_LEVELS = [
     { level: 1, speed: 135, cols: 20, rows: 16, label: 'Iniciante' },
     { level: 2, speed: 125, cols: 22, rows: 18, label: 'Aprendiz' },
@@ -10,8 +13,18 @@ const SNAKE_LEVELS = [
     { level: 7, speed: 75,  cols: 36, rows: 28, label: 'Emperador' },
 ];
 
+<<<<<<< HEAD
 // Puntos por fruta según nivel.
 // Cuanto más alto sea el nivel, más vale cada fruta.
 function getPointsForLevel(level) {
     return level * 10;
+=======
+function getPointsForLevel(level) {
+    return level * 10;
+}
+
+// Nivel fijo para modo versus
+function getVersusLevel() {
+    return { level: 1, speed: 120, cols: 24, rows: 20, label: 'Arena Duelo' };
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 }

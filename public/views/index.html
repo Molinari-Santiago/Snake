@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Romano — Coliseo Multijugador</title>
+    <meta name="description" content="Snake Game multijugador con temática del Coliseo Romano. Italia vs Argentina en una épica batalla de serpientes.">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<header>
+    <div class="top-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar modo día o noche">☀️ Modo día</button>
+        <button class="icon-btn" id="soundToggle" type="button" aria-label="Activar o desactivar sonidos">🔊 Sonido</button>
+    </div>
+    <h1>🐍 SNAKE ROMANO</h1>
+    <p>COLISEO MULTIJUGADOR POR TURNOS</p>
+</header>
+
+<div class="game-layout">
+
+    <aside class="player-panel" id="panel1">
+        <div class="panel-menu">
+            <h2>📜 GUÍA RÁPIDA</h2>
+            <div class="menu-panel-body">
+                <p class="menu-panel-title">🏛️ Bienvenido al Coliseo</p>
+                <p class="menu-panel-text">Elegí modo de juego y preparate para crecer, sumar puntos y dominar la arena.</p>
+                <div class="divider"></div>
+                <p class="menu-panel-text"><strong>Consejo:</strong> priorizá espacios abiertos y evitá encerrarte.</p>
+                <p class="menu-panel-text"><strong>Pausa:</strong> P / ESC</p>
+            </div>
+        </div>
+
+        <div class="panel-game">
+            <h2>⚔ JUGADOR 1</h2>
+            <div class="player-flag">🇮🇹</div>
+            <div class="player-name p1-name">ITALIA</div>
+            <div class="score-label">PUNTOS</div>
+            <div class="score-value" id="p1Score">0</div>
+            <div class="controls-box">
+                <p>
+                    <span class="key">W</span> Arriba<br>
+                    <span class="key">S</span> Abajo<br>
+                    <span class="key">A</span> Izquierda<br>
+                    <span class="key">D</span> Derecha
+                </p>
+            </div>
+            <div class="controls-box food-info">
+                <p><img src="assets/sprites/pizza.png" alt="Pizza" class="mini-sprite"> Fruta: Pizza</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="canvas-column">
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+
+            <div id="menuOverlay" class="overlay">
+                <div class="colosseum-deco">🏛️</div>
+                <h2>SNAKE ROMANO</h2>
+                <p class="subtitle">Coliseo — Italia vs Argentina</p>
+                <div class="divider"></div>
+                <p>🍕 P1 Italia: <strong>WASD</strong></p>
+                <p>🧉 P2 Argentina: <strong>↑↓←→</strong></p>
+                <p>⏸ Pausa: <strong>P / ESC</strong></p>
+                <p>🏆 Objetivo: comer, sumar puntos y completar los 7 niveles.</p>
+                <div class="divider"></div>
+
+                <div class="menu-actions">
+                    <button class="btn" id="startBattleBtn" type="button">⚔ INICIAR BATALLA</button>
+
+                    <div id="modeSelect" class="mode-select hidden" aria-label="Seleccionar modo">
+                        <button class="btn" id="mode1Btn" type="button">1 JUGADOR</button>
+                        <button class="btn" id="mode2Btn" type="button">2 JUGADORES</button>
+                        <button class="btn secondary small-btn" id="modeBackBtn" type="button">↩ VOLVER</button>
+                    </div>
+
+                    <div id="singleSideSelect" class="mode-select hidden" aria-label="Elegir jugador">
+                        <button class="btn" id="sideItaliaBtn" type="button">🇮🇹 ITALIA</button>
+                        <button class="btn" id="sideArgentinaBtn" type="button">🇦🇷 ARGENTINA</button>
+                        <button class="btn secondary small-btn" id="sideBackBtn" type="button">↩ VOLVER</button>
+                    </div>
+
+                    <div id="versusInfo" class="mode-select hidden" aria-label="Información 2 jugadores">
+                        <div class="mode-card">
+                            <h3 class="mode-title">⚔ 2 JUGADORES</h3>
+                            <p class="mode-text"><strong>Jugador 1:</strong> 🇮🇹 Italia (WASD)</p>
+                            <p class="mode-text"><strong>Jugador 2:</strong> 🇦🇷 Argentina (↑ ↓ ← →)</p>
+                            <div class="divider"></div>
+                            <p class="mode-text">Turnos: juega Italia, al perder juega Argentina.</p>
+                            <p class="mode-text">Si alguien completa el juego, gana automáticamente.</p>
+                            <p class="mode-text">Si nadie lo completa, gana el mayor puntaje. Si empatan, hay empate.</p>
+                        </div>
+
+                        <button class="btn" id="versusStartBtn" type="button">▶ EMPEZAR</button>
+                        <button class="btn secondary small-btn" id="versusBackBtn" type="button">↩ VOLVER</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nuevo overlay para ingresar nombre REAL -->
+            <div id="nameInputOverlay" class="overlay hidden">
+                <div class="colosseum-deco">📜</div>
+                <h2>INGRESA TU NOMBRE</h2>
+                <p class="subtitle">Para registrar tu puntaje en el ranking</p>
+                <div class="divider"></div>
+                
+                <div class="name-input-container">
+                    <input type="text" id="realNameInput" class="name-input-field" placeholder="Tu nombre real" maxlength="30" autocomplete="off">
+                    <div class="input-error hidden" id="nameInputError"></div>
+                </div>
+                
+                <div class="divider"></div>
+                <div class="overlay-actions">
+                    <button class="btn" id="confirmNameBtn" type="button">✅ CONFIRMAR</button>
+                </div>
+            </div>
+
+            <!-- Modal de confirmación para limpiar ranking -->
+            <div id="clearRankingModal" class="overlay hidden">
+                <div class="colosseum-deco">⚠️</div>
+                <h2>LIMPIAR RANKING</h2>
+                <p class="subtitle">¿Estás seguro de que quieres eliminar todos los puntajes?</p>
+                <div class="divider"></div>
+                <p class="warning-text">Esta acción no se puede deshacer.</p>
+                <div class="divider"></div>
+                <div class="overlay-actions">
+                    <button class="btn danger" id="confirmClearRankingBtn">✅ SÍ, LIMPIAR</button>
+                    <button class="btn secondary" id="cancelClearRankingBtn">❌ CANCELAR</button>
+                </div>
+            </div>
+
+            <div id="pauseOverlay" class="overlay hidden">
+                <div class="colosseum-deco">⏸</div>
+                <h2 id="pauseTitle">PAUSA</h2>
+                <p id="pauseSubtitle">La batalla está en espera...</p>
+
+                <div class="overlay-actions">
+                    <button class="btn" id="pauseBtn" onclick="if(window.game) window.game.setState('PLAYING')">▶ CONTINUAR</button>
+                    <button class="btn secondary" id="pauseRestartBtn" onclick="if(window.game) window.game.resetGame()">↺ REINICIAR</button>
+                    <button class="btn danger" id="pauseExitBtn" onclick="if(window.game) window.game.requestExit()">⟵ SALIR</button>
+                </div>
+            </div>
+
+            <div id="exitConfirmOverlay" class="overlay hidden">
+                <div class="colosseum-deco">⚠️</div>
+                <h2>SALIR DEL JUEGO</h2>
+                <p class="subtitle">Si salís ahora, el puntaje de esta partida no se guardará.</p>
+                <div class="divider"></div>
+
+                <div class="overlay-actions">
+                   <button class="btn danger" id="exitConfirmBtn" onclick="if(window.game) window.game.confirmExit()">SALIR</button>
+                   <button class="btn secondary" id="exitCancelBtn" onclick="if(window.game) window.game.cancelExit()">CANCELAR</button>
+                </div>
+            </div>
+
+            <div id="victoryOverlay" class="overlay hidden">
+                <div class="colosseum-deco">🏆</div>
+                <h2>VICTORIA</h2>
+                <div id="victoryText" class="winner-text">¡Gloria en el Coliseo!</div>
+                <div class="divider"></div>
+                <div id="victoryScore" class="score-reveal"></div>
+                <div class="divider"></div>
+                <div class="overlay-actions" id="victoryActions">
+                    <button class="btn" id="nextLevelBtn" style="display: none;">⬆ SIGUIENTE NIVEL</button>
+                    <button class="btn" id="victoryMenuBtn">🏛 VOLVER AL MENÚ</button>
+                </div>
+            </div>
+
+            <div id="defeatOverlay" class="overlay hidden">
+                <div class="colosseum-deco">💀</div>
+                <h2>DERROTA</h2>
+                <div id="defeatText" class="winner-text">La batalla terminó...</div>
+                <div class="divider"></div>
+                <div id="defeatScore" class="score-reveal"></div>
+                <div class="divider"></div>
+                <button class="btn" onclick="if(window.game) window.game.resetGame()">⚔ REINTENTAR</button>
+                <button class="btn secondary" onclick="if(window.game) window.game.setState('MENU')">🏛 MENÚ</button>
+            </div>
+
+            <div id="tieOverlay" class="overlay hidden">
+                <div class="colosseum-deco">🤝</div>
+                <h2>EMPATE</h2>
+                <div id="tieText" class="winner-text">¡Duelo parejo en el Coliseo!</div>
+                <div class="divider"></div>
+                <div id="tieScore" class="score-reveal"></div>
+                <div class="divider"></div>
+                <button class="btn" onclick="if(window.game) window.game.resetGame()">⚔ REVANCHA</button>
+                <button class="btn secondary" onclick="if(window.game) window.game.setState('MENU')">🏛 MENÚ</button>
+            </div>
+        </div>
+
+        <div id="levelBar">Nivel 1 — Iniciante</div>
+
+        <section class="touch-controls" aria-label="Controles táctiles">
+            <button data-touch-dir="UP">▲</button>
+            <div class="touch-row">
+                <button data-touch-dir="LEFT">◀</button>
+                <button data-touch-dir="DOWN">▼</button>
+                <button data-touch-dir="RIGHT">▶</button>
+            </div>
+        </section>
+    </main>
+
+    <aside class="player-panel" id="panel2">
+        <div class="panel-menu">
+            <h2>🏆 OBJETIVO</h2>
+            <div class="menu-panel-body">
+                <p class="menu-panel-title">Reglas del Coliseo</p>
+                <p class="menu-panel-text">Comé para crecer y sumar puntos. Si chocás, perdés.</p>
+                <div class="divider"></div>
+                <p class="menu-panel-text"><strong>2 jugadores:</strong> juega Italia, luego Argentina. Si nadie completa el juego, gana el mayor puntaje (o empate).</p>
+            </div>
+        </div>
+
+        <div class="panel-game">
+            <h2>⚔ JUGADOR 2</h2>
+            <div class="player-flag">🇦🇷</div>
+            <div class="player-name p2-name">ARGENTINA</div>
+            <div class="score-label">PUNTOS</div>
+            <div class="score-value" id="p2Score">0</div>
+            <div class="controls-box">
+                <p>
+                    <span class="key">↑</span> Arriba<br>
+                    <span class="key">↓</span> Abajo<br>
+                    <span class="key">←</span> Izquierda<br>
+                    <span class="key">→</span> Derecha
+                </p>
+            </div>
+            <div class="controls-box food-info">
+                <p><img src="assets/sprites/mate.png" alt="Mate" class="mini-sprite"> Fruta: Mate</p>
+            </div>
+        </div>
+    </aside>
+
+</div>
+
+<section class="ranking-card page-ranking">
+    <h2>🏆 Mejores puntajes</h2>
+    <div id="rankingList" class="ranking-list-container"></div>
+   <button class="btn secondary small-btn" onclick="clearScores()">Limpiar ranking</button>
+
+</section>
+
+<script src="../scripts/storage.js"></script>
+<script src="../scripts/audio.js"></script>
+<script src="../scripts/levels.js"></script>
+<script src="../scripts/input.js"></script>
+<script src="../scripts/collision.js"></script>
+<script src="../scripts/food.js"></script>
+<script src="../scripts/snake.js"></script>
+<script src="../scripts/renderer.js"></script>
+<script src="../scripts/game.js"></script>
+
+</body>
+</html>

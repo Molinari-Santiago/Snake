@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 /* main.css — Snake Romano: Coliseo responsive con modo día/noche */
+=======
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,6 +64,15 @@ body {
     gap: 12px;
 }
 
+<<<<<<< HEAD
+=======
+body.lock-scroll {
+    overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 header {
     width: min(100%, 1600px);
     text-align: center;
@@ -100,14 +112,28 @@ header p {
     letter-spacing: 3px;
 }
 
+<<<<<<< HEAD
 .game-layout {
     display: grid;
+=======
+/* Layout base: grid con áreas, para que 1J no se rompa cuando se oculta panel1 o panel2 */
+.game-layout {
+    display: grid;
+    grid-template-areas: "panel1 canvas panel2";
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
     grid-template-columns: minmax(170px, 1fr) minmax(280px, 720px) minmax(170px, 1fr);
     align-items: stretch;
     gap: clamp(10px, 2vw, 28px);
     width: min(100%, 1600px);
 }
 
+<<<<<<< HEAD
+=======
+#panel1 { grid-area: panel1; }
+#panel2 { grid-area: panel2; }
+.canvas-column { grid-area: canvas; }
+
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 .player-panel {
     min-width: 0;
     background: var(--panel-bg);
@@ -241,6 +267,10 @@ header p {
     text-shadow: 0 0 8px var(--gold-dark);
 }
 
+<<<<<<< HEAD
+=======
+/* Overlay (sin duplicados, scroll solo en mobile) */
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 .overlay {
     position: absolute;
     inset: 0;
@@ -254,7 +284,11 @@ header p {
     gap: clamp(7px, 1.5vh, 12px);
     border-radius: 12px;
     padding: clamp(12px, 2vw, 18px);
+<<<<<<< HEAD
     overflow-y: auto;
+=======
+    overflow: hidden;
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 }
 
 .overlay.hidden { display: none; }
@@ -341,6 +375,10 @@ header p {
     margin: 4px 0;
 }
 
+<<<<<<< HEAD
+=======
+/* Ranking */
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 .ranking-card {
     width: min(100%, 920px);
     background: var(--panel-bg);
@@ -409,6 +447,10 @@ header p {
 
 .page-ranking { margin-bottom: 20px; }
 
+<<<<<<< HEAD
+=======
+/* Touch */
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 .touch-controls {
     display: none;
     margin-top: 12px;
@@ -433,21 +475,411 @@ header p {
     font-weight: 900;
 }
 
+<<<<<<< HEAD
 @media (max-width: 1050px) {
     .game-layout {
+=======
+/* Menú: acciones */
+.menu-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 520px);
+}
+
+.mode-select {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(100%, 360px);
+}
+
+.mode-card {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(201,162,39,0.55);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.18);
+}
+
+.mode-title {
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 2px;
+    font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+}
+
+.mode-text {
+    color: var(--text-muted);
+    text-align: center;
+    font-size: clamp(0.72rem, 1.1vw, 0.88rem);
+    letter-spacing: 1px;
+    line-height: 1.6;
+}
+
+/* Paneles menú vs paneles juego */
+.panel-menu { display: none; }
+.panel-game { display: flex; flex-direction: column; justify-content: center; }
+
+.menu-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-panel-title {
+    color: var(--gold);
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: 2px;
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
+}
+
+.menu-panel-text {
+    color: var(--text-muted);
+    text-align: center;
+    font-size: clamp(0.72rem, 1.05vw, 0.88rem);
+    letter-spacing: 1px;
+    line-height: 1.65;
+}
+
+/* Layout por modo */
+body.layout-menu .player-panel {
+    opacity: 1;
+    filter: none;
+    transform: none;
+}
+
+body.layout-menu .panel-game { display: none; }
+body.layout-menu .panel-menu { display: flex; flex-direction: column; justify-content: center; }
+body.layout-menu #levelBar { display: none; }
+
+body.layout-single .player-panel {
+    opacity: 1;
+    filter: none;
+    transform: none;
+}
+
+body.layout-single .panel-menu,
+body.layout-versus .panel-menu { display: none; }
+
+body.layout-single .panel-game,
+body.layout-versus .panel-game { display: flex; }
+
+body.layout-single .game-layout {
+    grid-template-areas: "side canvas";
+    grid-template-columns: minmax(160px, 240px) minmax(420px, 980px);
+    width: min(100%, 1400px);
+    justify-content: center;
+}
+
+body.layout-single #panel1,
+body.layout-single #panel2 {
+    grid-area: side;
+    max-width: 240px;
+}
+
+body.layout-single[data-single="1"] #panel2 { display: none; }
+body.layout-single[data-single="2"] #panel1 { display: none; }
+
+body.layout-versus .game-layout {
+    grid-template-areas: "panel1 canvas panel2";
+    grid-template-columns: minmax(170px, 1fr) minmax(280px, 720px) minmax(170px, 1fr);
+}
+.overlay-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 520px;
+}
+
+.btn.danger {
+    background: linear-gradient(135deg, #7a0f14, var(--red-ita));
+    color: var(--white);
+}
+
+body.layout-menu .player-panel {
+    opacity: 1;
+    filter: none;
+    transform: none;
+}
+
+/* Input de nombre real */
+.name-input-container {
+    width: 100%;
+    max-width: 320px;
+    margin: 10px 0;
+}
+
+.name-input-field {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: 'Cinzel', serif;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    text-align: center;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.name-input-field:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.name-input-field::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.input-error {
+    color: #ff6b6b;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Nuevo ranking con diseño mejorado */
+.ranking-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.ranking-card-v2 {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.2));
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ranking-card-v2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+.ranking-card-v2.top-1 {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 140, 0, 0.15));
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.ranking-card-v2.top-2 {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(100, 100, 100, 0.1));
+    border-color: #c0c0c0;
+}
+
+.ranking-card-v2.top-3 {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(139, 69, 19, 0.1));
+    border-color: #cd7f32;
+}
+
+.ranking-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.ranking-position-icon {
+    font-size: 2rem;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+}
+
+.ranking-player-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--gold);
+    flex: 1;
+}
+
+.ranking-score {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--gold-glow);
+}
+
+.ranking-details {
+    display: flex;
+    gap: 15px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.ranking-details span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Responsive para el ranking */
+@media (max-width: 620px) {
+    .ranking-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .ranking-position-icon {
+        font-size: 1.5rem;
+    }
+    
+    .ranking-player-name {
+        font-size: 0.9rem;
+    }
+    
+    .ranking-score {
+        font-size: 1rem;
+    }
+    
+    .ranking-details {
+        justify-content: center;
+        font-size: 0.65rem;
+    }
+}
+
+/* Indicador de nivel actual */
+.current-level-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--gold);
+    border: 1px solid var(--panel-border);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.canvas-wrapper {
+    position: relative;
+}
+
+/* Modal de confirmación */
+.warning-text {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+    text-align: center;
+}
+
+#clearRankingModal .overlay-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#clearRankingModal .btn.danger {
+    background: linear-gradient(135deg, #dc3545, #b02a37);
+    color: white;
+}
+
+#clearRankingModal .btn.danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(220, 53, 69, 0.45);
+}
+
+/* Responsive para el modal */
+@media (max-width: 620px) {
+    #clearRankingModal .overlay-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    #clearRankingModal .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1050px) {
+    body.layout-menu .player-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    body.layout-menu .player-panel,
+    body.layout-single .player-panel,
+    body.layout-versus .player-panel {
+        width: 100%;
+        border-radius: 14px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 620px) {
+    .overlay-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .overlay-actions .btn {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1050px) {
+    body.layout-menu .game-layout,
+    body.layout-versus .game-layout {
+        grid-template-areas:
+            "canvas"
+            "panel1"
+            "panel2";
+        grid-template-columns: 1fr;
+        width: min(100%, 760px);
+    }
+
+    body.layout-single .game-layout {
+        grid-template-areas:
+            "canvas"
+            "side";
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
         grid-template-columns: 1fr;
         width: min(100%, 760px);
     }
 
     .player-panel {
         display: grid;
+<<<<<<< HEAD
         grid-template-columns: auto 1fr auto;
+=======
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
         align-items: center;
         gap: 8px 12px;
     }
 
+<<<<<<< HEAD
     .player-panel h2,
     .controls-box {
+=======
+    .player-panel .panel-game h2,
+    .player-panel .panel-game .controls-box {
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
         display: none;
     }
 
@@ -486,6 +918,10 @@ header p {
     .overlay {
         justify-content: flex-start;
         padding-top: 14px;
+<<<<<<< HEAD
+=======
+        overflow-y: auto;
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
     }
 
     .btn {
@@ -512,6 +948,12 @@ header p {
         width: 64px;
         height: 52px;
     }
+<<<<<<< HEAD
+=======
+
+    .menu-actions { width: 100%; }
+    .mode-select { width: 100%; max-width: 360px; }
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 }
 
 @media (max-width: 380px) {
@@ -527,6 +969,7 @@ header p {
         width: 55px;
         height: 48px;
     }
+<<<<<<< HEAD
 }
 /* ============================= */
 /* INPUTS DE NOMBRES DE JUGADOR */
@@ -635,4 +1078,6 @@ header p {
 
 .compact-ranking .ranking-clear-btn {
     margin-bottom: 10px;
+=======
+>>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
 }
