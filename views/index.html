@@ -7,12 +7,18 @@
     <meta name="description" content="Snake Game multijugador con temática del Coliseo Romano. Italia vs Argentina en una épica batalla de serpientes.">
     <link rel="stylesheet" href="styles/main.css">
 </head>
+
 <body>
 
 <header>
     <div class="top-actions">
-        <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar modo día o noche">☀️ Modo día</button>
-        <button class="icon-btn" id="soundToggle" type="button" aria-label="Activar o desactivar sonidos">🔊 Sonido</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar modo día o noche">
+            ☀️ Modo día
+        </button>
+
+        <button class="icon-btn" id="soundToggle" type="button" aria-label="Activar o desactivar sonidos">
+            🔊 Sonido
+        </button>
     </div>
 
     <h1>🐍 SNAKE ROMANO</h1>
@@ -21,7 +27,6 @@
 
 <div class="game-layout">
 
-    <!-- Panel jugador 1 -->
     <aside class="player-panel" id="panel1">
         <h2>⚔ JUGADOR 1</h2>
 
@@ -48,64 +53,93 @@
         </div>
     </aside>
 
-    <!-- Zona central del juego -->
     <main class="canvas-column">
         <div class="canvas-wrapper">
             <canvas id="gameCanvas"></canvas>
 
-           <!-- Menú principal -->
-<div id="menuOverlay" class="overlay">
-    <div class="colosseum-deco">🏛️</div>
+            <div id="menuOverlay" class="overlay">
+                <div class="colosseum-deco">🏛️</div>
 
-    <h2>SNAKE ROMANO</h2>
-    <p class="subtitle">Coliseo — Italia vs Argentina</p>
+                <h2>SNAKE ROMANO</h2>
+                <p class="subtitle">Coliseo — Italia vs Argentina</p>
 
-    <div class="divider"></div>
+                <div class="divider"></div>
 
-    <p>🍕 P1 Italia: <strong>WASD</strong></p>
-    <p>🧉 P2 Argentina: <strong>↑ ↓ ← →</strong></p>
-    <p>⏸ Pausa: <strong>P / ESC</strong></p>
-    <p>🏆 Objetivo: comer, sumar puntos y completar los 7 niveles.</p>
+                <p>🍕 P1 Italia: <strong>WASD</strong></p>
+                <p>🧉 P2 Argentina: <strong>↑ ↓ ← →</strong></p>
+                <p>⏸ Pausa: <strong>P / ESC</strong></p>
+                <p>🏆 Objetivo: comer, sumar puntos y completar los 7 niveles.</p>
 
-    <div class="divider"></div>
+                <div class="divider"></div>
 
-    <!-- Nombres de jugadores -->
-    <div class="name-config">
-        <div class="name-field">
-            <label for="player1Input">Nombre Jugador 1</label>
-            <input type="text" id="player1Input" maxlength="14" value="Italia" placeholder="Italia">
-        </div>
+                <div class="mode-config">
+                    <h3>Modo de juego</h3>
 
-        <div class="name-field">
-            <label for="player2Input">Nombre Jugador 2</label>
-            <input type="text" id="player2Input" maxlength="14" value="Argentina" placeholder="Argentina">
-        </div>
-    </div>
+                    <div class="mode-buttons">
+                        <button class="btn secondary mode-btn active" id="singleModeBtn" type="button">
+                            1 Jugador
+                        </button>
 
-    <button class="btn" id="startGameBtn" type="button">⚔ INICIAR BATALLA</button>
+                        <button class="btn secondary mode-btn" id="versusModeBtn" type="button">
+                            1 vs 1
+                        </button>
+                    </div>
+                </div>
 
-    <section class="ranking-card compact-ranking">
-        <h3>🏆 Ranking</h3>
+                <div class="name-config">
+                    <div class="name-field">
+                        <label for="player1Input">Nombre Jugador 1</label>
+                        <input type="text" id="player1Input" maxlength="14" value="Italia" placeholder="Italia">
+                    </div>
 
-        <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores()">
-            Limpiar ranking
-        </button>
+                    <div class="name-field">
+                        <label for="player2Input">Nombre Jugador 2</label>
+                        <input type="text" id="player2Input" maxlength="14" value="CPU" placeholder="Argentina" disabled>
+                    </div>
+                </div>
 
-        <ol data-ranking-list></ol>
-    </section>
-</div>
+                <button class="btn" id="startGameBtn" type="button">
+                    ⚔ INICIAR BATALLA
+                </button>
 
-<!-- Pausa / cambio de turno -->
-<div id="pauseOverlay" class="overlay hidden">
-    <div class="colosseum-deco">⏸</div>
+                <div class="ranking-columns menu-ranking-columns">
+                    <section class="ranking-card compact-ranking">
+                        <h3>🏆 Ranking 1 Jugador</h3>
 
-    <h2 id="pauseTitle">PAUSA</h2>
-    <p id="pauseSubtitle">La batalla está en espera...</p>
+                        <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('single')">
+                            Limpiar 1J
+                        </button>
 
-    <button class="btn" id="pauseBtn" type="button" onclick="window.game.setState('PLAYING')">▶ CONTINUAR</button>
-    <button class="btn secondary" id="pauseRestartBtn" type="button" onclick="window.game.resetGame()">↺ REINICIAR</button>
-</div>
-            <!-- Game Over -->
+                        <ol data-ranking-list="single"></ol>
+                    </section>
+
+                    <section class="ranking-card compact-ranking">
+                        <h3>⚔ Ranking 1 vs 1</h3>
+
+                        <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('versus')">
+                            Limpiar 1v1
+                        </button>
+
+                        <ol data-ranking-list="versus"></ol>
+                    </section>
+                </div>
+            </div>
+
+            <div id="pauseOverlay" class="overlay hidden">
+                <div class="colosseum-deco">⏸</div>
+
+                <h2 id="pauseTitle">PAUSA</h2>
+                <p id="pauseSubtitle">La batalla está en espera...</p>
+
+                <button class="btn" id="pauseBtn" type="button" onclick="window.game.setState('PLAYING')">
+                    ▶ CONTINUAR
+                </button>
+
+                <button class="btn secondary" id="pauseRestartBtn" type="button" onclick="window.game.resetGame()">
+                    ↺ REINICIAR
+                </button>
+            </div>
+
             <div id="gameOverOverlay" class="overlay hidden">
                 <div class="colosseum-deco">💀</div>
 
@@ -118,21 +152,42 @@
                 <div id="goP1Score" class="score-reveal"></div>
                 <div id="goP2Score" class="score-reveal"></div>
 
-                <section class="ranking-card compact-ranking">
-                    <h3>🏆 Ranking</h3>
-                    <ol data-ranking-list></ol>
-                </section>
+                <div class="ranking-columns menu-ranking-columns">
+                    <section class="ranking-card compact-ranking">
+                        <h3>🏆 Ranking 1 Jugador</h3>
+
+                        <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('single')">
+                            Limpiar 1J
+                        </button>
+
+                        <ol data-ranking-list="single"></ol>
+                    </section>
+
+                    <section class="ranking-card compact-ranking">
+                        <h3>⚔ Ranking 1 vs 1</h3>
+
+                        <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('versus')">
+                            Limpiar 1v1
+                        </button>
+
+                        <ol data-ranking-list="versus"></ol>
+                    </section>
+                </div>
 
                 <div class="divider"></div>
 
-                <button class="btn" type="button" onclick="window.game.resetGame()">⚔ REVANCHA</button>
-                <button class="btn secondary" type="button" onclick="window.game.setState('MENU')">🏛 MENÚ</button>
+                <button class="btn" type="button" onclick="window.game.resetGame()">
+                    ⚔ REVANCHA
+                </button>
+
+                <button class="btn secondary" type="button" onclick="window.game.setState('MENU')">
+                    🏛 MENÚ
+                </button>
             </div>
         </div>
 
         <div id="levelBar">Nivel 1 — Iniciante</div>
 
-        <!-- Controles táctiles -->
         <section class="touch-controls" aria-label="Controles táctiles">
             <button type="button" data-touch-dir="UP">▲</button>
 
@@ -144,12 +199,11 @@
         </section>
     </main>
 
-    <!-- Panel jugador 2 -->
     <aside class="player-panel" id="panel2">
         <h2>⚔ JUGADOR 2</h2>
 
         <div class="player-flag">🇦🇷</div>
-        <div class="player-name p2-name" id="p2NameLabel">ARGENTINA</div>
+        <div class="player-name p2-name" id="p2NameLabel">CPU</div>
 
         <div class="score-label">PUNTOS</div>
         <div class="score-value" id="p2Score">0</div>
@@ -173,18 +227,32 @@
 
 </div>
 
-<!-- Ranking general -->
 <section class="ranking-card page-ranking">
     <h2>🏆 Mejores puntajes</h2>
 
-    <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores()">
-        Limpiar ranking
-    </button>
+    <div class="ranking-columns">
+        <div>
+            <h3>1 Jugador</h3>
 
-    <ol data-ranking-list></ol>
+            <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('single')">
+                Limpiar ranking 1J
+            </button>
+
+            <ol data-ranking-list="single"></ol>
+        </div>
+
+        <div>
+            <h3>1 vs 1</h3>
+
+            <button class="btn secondary small-btn ranking-clear-btn" type="button" onclick="clearScores('versus')">
+                Limpiar ranking 1v1
+            </button>
+
+            <ol data-ranking-list="versus"></ol>
+        </div>
+    </div>
 </section>
 
-<!-- Scripts: el orden es importante -->
 <script src="scripts/storage.js"></script>
 <script src="scripts/audio.js"></script>
 <script src="scripts/levels.js"></script>

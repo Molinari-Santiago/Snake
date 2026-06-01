@@ -1,30 +1,71 @@
-<<<<<<< HEAD
-// levels.js — Configuración de los 7 niveles del Snake Romano
-// Cada objeto controla dificultad, tamaño del mapa y etiqueta que se muestra en pantalla.
-=======
->>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
+// levels.js — Configuración de niveles del Snake Romano
+// Define tamaño del tablero, velocidad y puntaje según nivel.
+
 const SNAKE_LEVELS = [
-    { level: 1, speed: 135, cols: 20, rows: 16, label: 'Iniciante' },
-    { level: 2, speed: 125, cols: 22, rows: 18, label: 'Aprendiz' },
-    { level: 3, speed: 115, cols: 24, rows: 20, label: 'Gladiador' },
-    { level: 4, speed: 105, cols: 26, rows: 22, label: 'Centurión' },
-    { level: 5, speed: 95,  cols: 28, rows: 24, label: 'Legionario' },
-    { level: 6, speed: 85,  cols: 32, rows: 26, label: 'General' },
-    { level: 7, speed: 75,  cols: 36, rows: 28, label: 'Emperador' },
+    {
+        level: 1,
+        label: "Iniciante",
+        cols: 24,
+        rows: 18,
+        speed: 170,
+        points: 10,
+    },
+    {
+        level: 2,
+        label: "Aprendiz",
+        cols: 26,
+        rows: 20,
+        speed: 150,
+        points: 15,
+    },
+    {
+        level: 3,
+        label: "Gladiador",
+        cols: 28,
+        rows: 21,
+        speed: 130,
+        points: 20,
+    },
+    {
+        level: 4,
+        label: "Centurión",
+        cols: 30,
+        rows: 22,
+        speed: 115,
+        points: 25,
+    },
+    {
+        level: 5,
+        label: "General",
+        cols: 32,
+        rows: 24,
+        speed: 100,
+        points: 30,
+    },
+    {
+        level: 6,
+        label: "Leyenda",
+        cols: 34,
+        rows: 25,
+        speed: 85,
+        points: 35,
+    },
+    {
+        level: 7,
+        label: "Emperador",
+        cols: 36,
+        rows: 26,
+        speed: 70,
+        points: 40,
+    },
 ];
 
-<<<<<<< HEAD
-// Puntos por fruta según nivel.
-// Cuanto más alto sea el nivel, más vale cada fruta.
-function getPointsForLevel(level) {
-    return level * 10;
-=======
-function getPointsForLevel(level) {
-    return level * 10;
-}
+function getPointsForLevel(levelNumber) {
+    const level = SNAKE_LEVELS.find((item) => item.level === levelNumber);
 
-// Nivel fijo para modo versus
-function getVersusLevel() {
-    return { level: 1, speed: 120, cols: 24, rows: 20, label: 'Arena Duelo' };
->>>>>>> 3e2c6283ed0b685975ca27d0846ae9e60c85a027
+    if (!level) {
+        return 10;
+    }
+
+    return level.points;
 }
