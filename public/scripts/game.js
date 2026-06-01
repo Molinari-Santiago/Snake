@@ -1,5 +1,5 @@
 // game.js — Archivo principal del juego
-// Controla estados, turnos, puntajes, niveles, nombres de jugadores y conexión entre todas las clases.
+// Controla estados, turnos, puntajes, niveles, nombres de jugadores, sonidos y conexión entre todas las clases.
 
 class Game {
     constructor() {
@@ -23,6 +23,8 @@ class Game {
         this.applyPlayerNames();
         this.setState("MENU");
         renderRanking();
+
+        console.log("Game creado correctamente.");
     }
 
     sanitizePlayerName(value, fallback) {
@@ -54,40 +56,68 @@ class Game {
     setupUI() {
         const themeToggle = document.getElementById("themeToggle");
         const soundToggle = document.getElementById("soundToggle");
+        const startGameBtn = document.getElementById("startGameBtn");
 
-        const savedTheme = localStorage.getItem("snakeRomano_theme") || "dark";
-        document.documentElement.setAttribute("data-theme", savedTheme);
-        themeToggle.textContent = savedTheme === "dark" ? "☀️ Modo día" : "🌙 Modo noche";
+        if (startGameBtn) {
+            startGameBtn.addEventListener("click", () => {
+                console.log("Botón iniciar presionado.");
+                this.startGame();
+            });
+        }
 
-        themeToggle.addEventListener("click", () => {
-            const currentTheme = document.documentElement.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
+        if (themeToggle) {
+            const savedTheme = localStorage.getItem("snakeRomano_theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            themeToggle.textContent = savedTheme === "dark" ? "☀️ Modo día" : "🌙 Modo noche";
 
-            document.documentElement.setAttribute("data-theme", newTheme);
-            localStorage.setItem("snakeRomano_theme", newTheme);
+            themeToggle.addEventListener("click", () => {
+                const currentTheme = document.documentElement.getAttribute("data-theme");
+                const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-            themeToggle.textContent = newTheme === "dark" ? "☀️ Modo día" : "🌙 Modo noche";
-            soundManager.play("click");
-        });
+                document.documentElement.setAttribute("data-theme", newTheme);
+                localStorage.setItem("snakeRomano_theme", newTheme);
 
-        soundToggle.addEventListener("click", () => {
-            const enabled = soundManager.toggle();
-            soundToggle.textContent = enabled ? "🔊 Sonido" : "🔇 Sin sonido";
-            soundManager.play("click");
-        });
+                themeToggle.textContent = newTheme === "dark" ? "☀️ Modo día" : "🌙 Modo noche";
+                soundManager.play("click");
+            });
+        }
+
+        if (soundToggle) {
+            soundToggle.addEventListener("click", () => {
+                const enabled = soundManager.toggle();
+                soundToggle.textContent = enabled ? "🔊 Sonido" : "🔇 Sin sonido";
+                soundManager.play("click");
+            });
+        }
     }
 
     startGame() {
+        console.log("Iniciando partida...");
+
+        soundManager.play("click");
+
         this.applyPlayerNames();
 
         this.player1.reset();
         this.player2.reset();
+
+        this.player1.eatingTimer = 0;
+        this.player2.eatingTimer = 0;
 
         this.currentPlayer = 1;
         this.activeSnake = this.player1;
 
         this.prepareTurn();
         this.setState("PLAYING");
+
+        const level = this.activeSnake.getCurrentLevel();
+
+        this.renderer.drawGame(
+            this.activeSnake,
+            this.food,
+            level.cols,
+            level.rows
+        );
     }
 
     resetGame() {
@@ -100,12 +130,23 @@ class Game {
         const level = this.activeSnake.getCurrentLevel();
 
         this.input.reset();
+
+        this.activeSnake.direction = "RIGHT";
+        this.activeSnake.eatingTimer = 0;
+
         this.food.setTypeByPlayer(this.currentPlayer);
         this.food.randomize(level.cols, level.rows, this.activeSnake.body);
 
         this.updatePanels();
         this.updateScoreUI();
         this.updateLevelUI();
+
+        this.renderer.drawGame(
+            this.activeSnake,
+            this.food,
+            level.cols,
+            level.rows
+        );
     }
 
     update(timestamp = 0) {
@@ -119,6 +160,8 @@ class Game {
             this.lastUpdate = timestamp;
 
             this.input.updateDirection();
+
+            this.activeSnake.direction = this.input.currentDirection;
 
             const headBeforeMove = { ...this.activeSnake.body[0] };
             const nextHead = { ...headBeforeMove };
@@ -146,8 +189,16 @@ class Game {
                 const points = getPointsForLevel(level.level);
 
                 this.activeSnake.growAndScore(points);
+                this.activeSnake.eatingTimer = 10;
+
                 this.food.randomize(level.cols, level.rows, this.activeSnake.body);
-                soundManager.play("eat");
+
+                // Sonido diferente según el jugador.
+                if (this.currentPlayer === 1) {
+                    soundManager.play("eat");
+                } else {
+                    soundManager.play("eatArgentina");
+                }
 
                 const leveledUp = this.activeSnake.levelUpIfNeeded();
 
@@ -157,6 +208,10 @@ class Game {
                 }
 
                 this.updateScoreUI();
+            }
+
+            if (this.activeSnake.eatingTimer > 0) {
+                this.activeSnake.eatingTimer--;
             }
 
             this.renderer.drawGame(
@@ -174,6 +229,8 @@ class Game {
         this.activeSnake.alive = false;
 
         if (this.currentPlayer === 1) {
+            soundManager.play("turn");
+
             this.currentPlayer = 2;
             this.activeSnake = this.player2;
             this.prepareTurn();
@@ -225,9 +282,21 @@ class Game {
     setState(newState) {
         this.state = newState;
 
-        document.getElementById("menuOverlay").classList.toggle("hidden", newState !== "MENU");
-        document.getElementById("pauseOverlay").classList.toggle("hidden", newState !== "PAUSED");
-        document.getElementById("gameOverOverlay").classList.toggle("hidden", newState !== "GAME_OVER");
+        const menuOverlay = document.getElementById("menuOverlay");
+        const pauseOverlay = document.getElementById("pauseOverlay");
+        const gameOverOverlay = document.getElementById("gameOverOverlay");
+
+        if (menuOverlay) {
+            menuOverlay.classList.toggle("hidden", newState !== "MENU");
+        }
+
+        if (pauseOverlay) {
+            pauseOverlay.classList.toggle("hidden", newState !== "PAUSED");
+        }
+
+        if (gameOverOverlay) {
+            gameOverOverlay.classList.toggle("hidden", newState !== "GAME_OVER");
+        }
 
         if (newState === "PLAYING") {
             cancelAnimationFrame(this.animationId);
@@ -246,8 +315,13 @@ class Game {
         const panel1 = document.getElementById("panel1");
         const panel2 = document.getElementById("panel2");
 
-        panel1.classList.toggle("active", this.currentPlayer === 1 && this.state === "PLAYING");
-        panel2.classList.toggle("active", this.currentPlayer === 2 && this.state === "PLAYING");
+        if (panel1) {
+            panel1.classList.toggle("active", this.currentPlayer === 1 && this.state === "PLAYING");
+        }
+
+        if (panel2) {
+            panel2.classList.toggle("active", this.currentPlayer === 2 && this.state === "PLAYING");
+        }
     }
 
     updateScoreUI() {
@@ -267,5 +341,8 @@ class Game {
     }
 }
 
-// Se crea una instancia global para que los botones del HTML puedan llamar a sus métodos.
-const game = new Game();
+// Se crea el juego cuando el HTML ya está listo.
+window.addEventListener("DOMContentLoaded", () => {
+    window.game = new Game();
+    console.log("Snake Romano iniciado correctamente.");
+});

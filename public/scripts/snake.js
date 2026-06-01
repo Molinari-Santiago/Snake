@@ -1,5 +1,5 @@
 // snake.js — Clase Snake
-// Cada jugador tiene su propia serpiente, puntaje y nivel actual.
+// Cada jugador tiene su propia serpiente, puntaje, nivel, dirección y animación al comer.
 
 class Snake {
     constructor(playerNumber, startX, startY, color) {
@@ -7,6 +7,10 @@ class Snake {
         this.startX = startX;
         this.startY = startY;
         this.color = color;
+
+        this.name = playerNumber === 1 ? "Italia" : "Argentina";
+        this.direction = "RIGHT";
+        this.eatingTimer = 0;
 
         this.reset();
     }
@@ -21,20 +25,22 @@ class Snake {
         this.score = 0;
         this.levelIndex = 0;
         this.alive = true;
+        this.direction = "RIGHT";
+        this.eatingTimer = 0;
     }
 
     move(direction, shouldGrow) {
+        this.direction = direction;
+
         const head = { ...this.body[0] };
 
-        if (direction === 'UP') head.y--;
-        if (direction === 'DOWN') head.y++;
-        if (direction === 'LEFT') head.x--;
-        if (direction === 'RIGHT') head.x++;
+        if (direction === "UP") head.y--;
+        if (direction === "DOWN") head.y++;
+        if (direction === "LEFT") head.x--;
+        if (direction === "RIGHT") head.x++;
 
-        // Agrega la nueva cabeza al principio del array.
         this.body.unshift(head);
 
-        // Si no comió, se elimina la cola para mantener el largo.
         if (!shouldGrow) {
             this.body.pop();
         }
@@ -49,7 +55,6 @@ class Snake {
     }
 
     levelUpIfNeeded() {
-        // Cada 50 puntos sube de nivel, hasta llegar al nivel máximo.
         const nextLevelIndex = Math.floor(this.score / 50);
 
         if (

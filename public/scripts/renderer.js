@@ -1,32 +1,104 @@
 // renderer.js — Dibujo del juego en el canvas
-// Este archivo dibuja el mapa, la serpiente, la comida y los sprites.
-// También mejora el cuerpo de la serpiente y achica la cabeza.
+// Dibuja tablero, comida, cuerpo con textura PNG y cabezas con sprites seguros.
 
 class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
+        this.ctx = canvas.getContext("2d");
 
-        // Sprites de comida
+        // Imágenes de comida.
         this.foodImages = {
             pizza: new Image(),
             mate: new Image(),
         };
 
-        this.foodImages.pizza.src = 'assets/sprites/pizza.png';
-        this.foodImages.mate.src = 'assets/sprites/mate.png';
+        this.foodImages.pizza.src = "assets/sprites/pizza.svg";
+        this.foodImages.mate.src = "assets/sprites/mate.svg";
 
-        // Sprites de cabeza de cada jugador
+        // Texturas del cuerpo de cada serpiente.
+        this.snakeBodies = {
+    1: {
+        horizontal: new Image(),
+        vertical: new Image(),
+        curveLeftUp: new Image(),
+        curveLeftDown: new Image(),
+        curveRightUp: new Image(),
+        curveRightDown: new Image(),
+    },
+    2: {
+        horizontal: new Image(),
+        vertical: new Image(),
+        curveLeftUp: new Image(),
+        curveLeftDown: new Image(),
+        curveRightUp: new Image(),
+        curveRightDown: new Image(),
+    },
+};
+
+this.snakeBodies = {
+    1: {
+        horizontal: new Image(),
+        vertical: new Image(),
+        curveLeftUp: new Image(),
+        curveLeftDown: new Image(),
+        curveRightUp: new Image(),
+        curveRightDown: new Image(),
+    },
+    2: {
+        horizontal: new Image(),
+        vertical: new Image(),
+        curveLeftUp: new Image(),
+        curveLeftDown: new Image(),
+        curveRightUp: new Image(),
+        curveRightDown: new Image(),
+    },
+};
+
+// Italia
+this.snakeBodies[1].horizontal.src = "assets/sprites/italiacuerpo.png";
+this.snakeBodies[1].vertical.src = "assets/sprites/italiacuerpovertical.png";
+this.snakeBodies[1].curveLeftUp.src = "assets/sprites/italia-curve-l-down.png";
+this.snakeBodies[1].curveLeftDown.src = "assets/sprites/italia-curve-l-up.png";
+this.snakeBodies[1].curveRightUp.src = "assets/sprites/italia-curve-r-down.png";
+this.snakeBodies[1].curveRightDown.src = "assets/sprites/italia-curve-r-up.png";
+
+// Argentina
+this.snakeBodies[2].horizontal.src = "assets/sprites/argentinacuerpo.png";
+this.snakeBodies[2].vertical.src = "assets/sprites/argentinacuerpovertical.png";
+this.snakeBodies[2].curveLeftUp.src = "assets/sprites/_E0E5DBFA-AF69-43CE-8AE9-F9C4E46EA1FB_-removebg-preview.png";
+this.snakeBodies[2].curveLeftDown.src = "assets/sprites/argentina-curve-l-up.png";
+this.snakeBodies[2].curveRightUp.src = "assets/sprites/argentina-curve-r-down.png";
+this.snakeBodies[2].curveRightDown.src = "assets/sprites/argentina-curve-r-up.png";
+        // Cabezas de cada serpiente según dirección.
         this.snakeHeads = {
-            1: new Image(),
-            2: new Image(),
+            1: {
+                RIGHT: new Image(),
+                LEFT: new Image(),
+                UP: new Image(),
+                DOWN: new Image(),
+            },
+            2: {
+                RIGHT: new Image(),
+                LEFT: new Image(),
+                UP: new Image(),
+                DOWN: new Image(),
+            },
         };
 
-        this.snakeHeads[1].src = 'assets/sprites/snake-italia-head.png';
-        this.snakeHeads[2].src = 'assets/sprites/snake-argentina-head.png';
+        // Jugador 1: Italia.
+        this.snakeHeads[1].RIGHT.src = "assets/sprites/italiacabeza.png";
+        this.snakeHeads[1].LEFT.src = "assets/sprites/italiaizq.png";
+        this.snakeHeads[1].UP.src = "assets/sprites/italiavertical.png";
+        this.snakeHeads[1].DOWN.src = "assets/sprites/italiaabajo.png";
+
+        // Jugador 2: Argentina.
+        this.snakeHeads[2].RIGHT.src = "assets/sprites/argentinaderecha.png";
+        this.snakeHeads[2].LEFT.src = "assets/sprites/argentinacabeza.png";
+        this.snakeHeads[2].UP.src = "assets/sprites/argentinavertical.png";
+        this.snakeHeads[2].DOWN.src = "assets/sprites/argentinaabajo.png";
 
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        window.addEventListener("resize", () => this.resize());
     }
 
     resize() {
@@ -47,16 +119,39 @@ class Renderer {
             .trim();
     }
 
+    getSnakeId(snake) {
+        return snake.playerNumber || snake.id || 1;
+    }
+
+    getSnakeColors(snake) {
+        const id = this.getSnakeId(snake);
+
+        if (id === 1) {
+            return {
+                main: snake.color || "#009246",
+                border: "#006b35",
+                detail: "#f5f0e8",
+                shadow: "rgba(0, 80, 30, 0.28)",
+            };
+        }
+
+        return {
+            main: snake.color || "#74acdf",
+            border: "#2b6ca3",
+            detail: "#f5f0e8",
+            shadow: "rgba(0, 70, 120, 0.28)",
+        };
+    }
+
     drawBoard(cols, rows) {
         const cellWidth = this.canvas.width / cols;
         const cellHeight = this.canvas.height / rows;
 
-        // Fondo de arena
-        this.ctx.fillStyle = this.getThemeValue('--canvas-bg') || '#c8a96e';
+        this.ctx.fillStyle = this.getThemeValue("--canvas-bg") || "#c8a96e";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Grilla suave del coliseo
-        this.ctx.strokeStyle = 'rgba(90, 50, 20, 0.18)';
+        // Grilla del coliseo.
+        this.ctx.strokeStyle = "rgba(90, 50, 20, 0.18)";
         this.ctx.lineWidth = 1;
 
         for (let x = 0; x <= cols; x++) {
@@ -73,40 +168,15 @@ class Renderer {
             this.ctx.stroke();
         }
 
-        // Borde externo del coliseo
-        this.ctx.strokeStyle = '#6b3a1f';
+        // Borde externo.
+        this.ctx.strokeStyle = "#6b3a1f";
         this.ctx.lineWidth = 8;
         this.ctx.strokeRect(4, 4, this.canvas.width - 8, this.canvas.height - 8);
 
-        // Borde interno más fino
-        this.ctx.strokeStyle = '#8b5e2a';
+        // Borde interno.
+        this.ctx.strokeStyle = "#8b5e2a";
         this.ctx.lineWidth = 3;
         this.ctx.strokeRect(12, 12, this.canvas.width - 24, this.canvas.height - 24);
-    }
-
-    getSnakeId(snake) {
-        // Compatible con snake.playerNumber o snake.id.
-        return snake.playerNumber || snake.id || 1;
-    }
-
-    getSnakeColors(snake) {
-        const id = this.getSnakeId(snake);
-
-        if (id === 1) {
-            return {
-                main: snake.color || '#009246',
-                border: '#006b35',
-                detail: '#f5f0e8',
-                shadow: 'rgba(0, 80, 30, 0.28)',
-            };
-        }
-
-        return {
-            main: snake.color || '#74acdf',
-            border: '#2b6ca3',
-            detail: '#f5f0e8',
-            shadow: 'rgba(0, 70, 120, 0.28)',
-        };
     }
 
     roundedPath(x, y, width, height, radius) {
@@ -122,6 +192,265 @@ class Renderer {
         this.ctx.quadraticCurveTo(x, y, x + radius, y);
         this.ctx.closePath();
     }
+    getBodySpriteKey(snake, index) {
+    const body = snake.body;
+
+    const current = body[index];
+    const previous = body[index - 1];
+    const next = body[index + 1];
+
+    // La cabeza usa la dirección actual.
+    if (index === 0) {
+        if (snake.direction === "UP" || snake.direction === "DOWN") {
+            return "vertical";
+        }
+
+        return "horizontal";
+    }
+
+    // La cola usa la relación con el segmento anterior.
+    if (!next && previous) {
+        if (previous.x === current.x) {
+            return "vertical";
+        }
+
+        return "horizontal";
+    }
+
+    if (!previous || !next) {
+        return "horizontal";
+    }
+
+    const sameColumn = previous.x === next.x;
+    const sameRow = previous.y === next.y;
+
+    if (sameColumn) {
+        return "vertical";
+    }
+
+    if (sameRow) {
+        return "horizontal";
+    }
+
+    /*
+        Detecta curvas según la posición del segmento anterior y siguiente.
+        Esto decide qué PNG usar.
+    */
+    const hasLeft = previous.x < current.x || next.x < current.x;
+    const hasRight = previous.x > current.x || next.x > current.x;
+    const hasUp = previous.y < current.y || next.y < current.y;
+    const hasDown = previous.y > current.y || next.y > current.y;
+
+    if (hasLeft && hasUp) return "curveLeftUp";
+    if (hasLeft && hasDown) return "curveLeftDown";
+    if (hasRight && hasUp) return "curveRightUp";
+    if (hasRight && hasDown) return "curveRightDown";
+
+    return "horizontal";
+}
+
+getBodyTransform(spriteKey, cellWidth, cellHeight) {
+    /*
+        Estos valores corrigen el encuadre visual.
+        Los rectos quedan casi del tamaño de la celda.
+        Las curvas un poco más chicas que antes y con offsets distintos.
+    */
+
+    const transforms = {
+        horizontal: {
+            width: cellWidth * 1.04,
+            height: cellHeight * 1.04,
+            offsetX: -cellWidth * 0.02,
+            offsetY: -cellHeight * 0.02,
+        },
+
+        vertical: {
+            width: cellWidth * 1.04,
+            height: cellHeight * 1.04,
+            offsetX: -cellWidth * 0.02,
+            offsetY: -cellHeight * 0.02,
+        },
+
+        curveLeftUp: {
+            width: cellWidth * 1.10,
+            height: cellHeight * 1.10,
+            offsetX: -cellWidth * 0.05,
+            offsetY: -cellHeight * 0.05,
+        },
+
+        curveLeftDown: {
+            width: cellWidth * 1.10,
+            height: cellHeight * 1.10,
+            offsetX: -cellWidth * 0.05,
+            offsetY: -cellHeight * 0.01,
+        },
+
+        curveRightUp: {
+            width: cellWidth * 1.10,
+            height: cellHeight * 1.10,
+            offsetX: -cellWidth * 0.01,
+            offsetY: -cellHeight * 0.05,
+        },
+
+        curveRightDown: {
+            width: cellWidth * 1.10,
+            height: cellHeight * 1.10,
+            offsetX: -cellWidth * 0.01,
+            offsetY: -cellHeight * 0.01,
+        },
+    };
+
+    return transforms[spriteKey] || transforms.horizontal;
+}
+
+getBodyTransform(spriteKey, cellWidth, cellHeight) {
+    /*
+        Ajustes finos por tipo de pieza.
+        Si alguna todavía queda corrida, solo cambiás estos valores.
+    */
+
+    const transforms = {
+        horizontal: {
+            width: cellWidth * 1.08,
+            height: cellHeight * 1.08,
+            offsetX: (cellWidth - cellWidth * 1.08) / 2,
+            offsetY: (cellHeight - cellHeight * 1.08) / 2,
+        },
+
+        vertical: {
+            width: cellWidth * 1.08,
+            height: cellHeight * 1.08,
+            offsetX: (cellWidth - cellWidth * 1.08) / 2,
+            offsetY: (cellHeight - cellHeight * 1.08) / 2,
+        },
+
+        curveLeftUp: {
+            width: cellWidth * 1.18,
+            height: cellHeight * 1.18,
+            offsetX: (cellWidth - cellWidth * 1.18) / 2,
+            offsetY: (cellHeight - cellHeight * 1.18) / 2,
+        },
+
+        curveLeftDown: {
+            width: cellWidth * 1.18,
+            height: cellHeight * 1.18,
+            offsetX: (cellWidth - cellWidth * 1.18) / 2,
+            offsetY: (cellHeight - cellHeight * 1.18) / 2,
+        },
+
+        curveRightUp: {
+            width: cellWidth * 1.18,
+            height: cellHeight * 1.18,
+            offsetX: (cellWidth - cellWidth * 1.18) / 2,
+            offsetY: (cellHeight - cellHeight * 1.18) / 2,
+        },
+
+        curveRightDown: {
+            width: cellWidth * 1.18,
+            height: cellHeight * 1.18,
+            offsetX: (cellWidth - cellWidth * 1.18) / 2,
+            offsetY: (cellHeight - cellHeight * 1.18) / 2,
+        },
+    };
+
+    return transforms[spriteKey] || transforms.horizontal;
+}
+
+drawRotatedImage(image, x, y, width, height, angle = 0) {
+    this.ctx.save();
+
+    this.ctx.translate(x + width / 2, y + height / 2);
+    this.ctx.rotate(angle);
+
+    this.ctx.drawImage(
+        image,
+        -width / 2,
+        -height / 2,
+        width,
+        height
+    );
+
+    this.ctx.restore();
+}
+getBodySpriteKey(snake, index) {
+    const body = snake.body;
+
+    const current = body[index];
+    const previous = body[index - 1];
+    const next = body[index + 1];
+
+    // La cabeza usa la dirección actual.
+    if (index === 0) {
+        if (snake.direction === "UP" || snake.direction === "DOWN") {
+            return "vertical";
+        }
+
+        return "horizontal";
+    }
+
+    // La cola usa la relación con el segmento anterior.
+    if (!next && previous) {
+        if (previous.x === current.x) {
+            return "vertical";
+        }
+
+        return "horizontal";
+    }
+
+    if (!previous || !next) {
+        return "horizontal";
+    }
+
+    // Rectas
+    if (previous.x === next.x) {
+        return "vertical";
+    }
+
+    if (previous.y === next.y) {
+        return "horizontal";
+    }
+
+    // Curvas: detecta hacia qué lados conecta el segmento actual.
+    const connectsLeft = previous.x < current.x || next.x < current.x;
+    const connectsRight = previous.x > current.x || next.x > current.x;
+    const connectsUp = previous.y < current.y || next.y < current.y;
+    const connectsDown = previous.y > current.y || next.y > current.y;
+
+    if (connectsLeft && connectsUp) return "curveLeftUp";
+    if (connectsLeft && connectsDown) return "curveLeftDown";
+    if (connectsRight && connectsUp) return "curveRightUp";
+    if (connectsRight && connectsDown) return "curveRightDown";
+
+    return "horizontal";
+}
+drawBodyTexture(snake, x, y, cellWidth, cellHeight, index) {
+    const id = this.getSnakeId(snake);
+    const spriteKey = this.getBodySpriteKey(snake, index);
+    const image = this.snakeBodies[id]?.[spriteKey];
+
+    if (!image || !image.complete || image.naturalWidth === 0) {
+        return false;
+    }
+
+    const transform = this.getBodyTransform(spriteKey, cellWidth, cellHeight);
+
+    const drawX = x + transform.offsetX;
+    const drawY = y + transform.offsetY;
+    const sizeW = transform.width;
+    const sizeH = transform.height;
+
+    this.ctx.save();
+
+    this.ctx.shadowColor = "rgba(0, 0, 0, 0.14)";
+    this.ctx.shadowBlur = 2;
+    this.ctx.shadowOffsetY = 1;
+
+    this.ctx.drawImage(image, drawX, drawY, sizeW, sizeH);
+
+    this.ctx.restore();
+
+    return true;
+}
 
     drawBodySegment(snake, x, y, cellWidth, cellHeight, index) {
         const colors = this.getSnakeColors(snake);
@@ -134,8 +463,8 @@ class Renderer {
 
         const radius = Math.min(sizeW, sizeH) * 0.28;
 
-        // Sombra inferior del cuerpo
         this.ctx.save();
+
         this.ctx.fillStyle = colors.shadow;
         this.ctx.beginPath();
         this.ctx.ellipse(
@@ -148,20 +477,15 @@ class Renderer {
             Math.PI * 2
         );
         this.ctx.fill();
-        this.ctx.restore();
 
-        // Base redondeada del cuerpo
-        this.ctx.save();
         this.roundedPath(innerX, innerY, sizeW, sizeH, radius);
         this.ctx.fillStyle = colors.main;
         this.ctx.fill();
 
-        // Borde del segmento
         this.ctx.lineWidth = 1.5;
         this.ctx.strokeStyle = colors.border;
         this.ctx.stroke();
 
-        // Brillo superior
         this.roundedPath(
             innerX + sizeW * 0.10,
             innerY + sizeH * 0.08,
@@ -169,10 +493,9 @@ class Renderer {
             sizeH * 0.28,
             radius * 0.7
         );
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+        this.ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
         this.ctx.fill();
 
-        // Franja clara central
         this.roundedPath(
             innerX + sizeW * 0.18,
             innerY + sizeH * 0.34,
@@ -185,7 +508,6 @@ class Renderer {
         this.ctx.fill();
         this.ctx.globalAlpha = 1;
 
-        // Marcas alternadas para que el cuerpo no sea plano
         if (index % 2 === 0) {
             this.roundedPath(
                 innerX + sizeW * 0.12,
@@ -194,17 +516,7 @@ class Renderer {
                 sizeH * 0.55,
                 radius * 0.35
             );
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.10)';
-            this.ctx.fill();
-
-            this.roundedPath(
-                innerX + sizeW * 0.72,
-                innerY + sizeH * 0.15,
-                sizeW * 0.16,
-                sizeH * 0.55,
-                radius * 0.35
-            );
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
+            this.ctx.fillStyle = "rgba(0, 0, 0, 0.10)";
             this.ctx.fill();
         }
 
@@ -213,14 +525,19 @@ class Renderer {
 
     drawHeadSprite(snake, x, y, cellWidth, cellHeight) {
         const id = this.getSnakeId(snake);
-        const image = this.snakeHeads[id];
+        const direction = snake.direction || "RIGHT";
+        const image = this.snakeHeads[id]?.[direction];
 
-        if (!image || !image.complete) {
+        // Evita que drawImage rompa el juego si el PNG no existe o está roto.
+        if (!image || !image.complete || image.naturalWidth === 0) {
             return false;
         }
 
-        // Antes estaba muy grande. Ahora la cabeza queda más chica.
-        const size = Math.min(cellWidth, cellHeight) * 1.35;
+        const isEating = snake.eatingTimer && snake.eatingTimer > 0;
+        const baseSize = Math.min(cellWidth, cellHeight);
+
+        // Cabeza un poco más grande cuando come.
+        const size = isEating ? baseSize * 1.65 : baseSize * 1.38;
 
         const centerX = x + cellWidth / 2;
         const centerY = y + cellHeight / 2;
@@ -228,14 +545,14 @@ class Renderer {
         let offsetX = 0;
         let offsetY = 0;
 
-        // Pequeño desplazamiento para que parezca que la cabeza mira hacia adelante.
-        if (snake.direction === 'UP') offsetY = -cellHeight * 0.08;
-        if (snake.direction === 'DOWN') offsetY = cellHeight * 0.08;
-        if (snake.direction === 'LEFT') offsetX = -cellWidth * 0.08;
-        if (snake.direction === 'RIGHT') offsetX = cellWidth * 0.08;
+        if (direction === "UP") offsetY = -cellHeight * 0.14;
+        if (direction === "DOWN") offsetY = cellHeight * 0.14;
+        if (direction === "LEFT") offsetX = -cellWidth * 0.14;
+        if (direction === "RIGHT") offsetX = cellWidth * 0.14;
 
         this.ctx.save();
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+
+        this.ctx.shadowColor = "rgba(0, 0, 0, 0.28)";
         this.ctx.shadowBlur = 4;
         this.ctx.shadowOffsetY = 2;
 
@@ -263,103 +580,84 @@ class Renderer {
 
         const radius = Math.min(sizeW, sizeH) * 0.35;
 
-        // Cabeza de respaldo si no carga el PNG
         this.ctx.save();
 
         this.roundedPath(innerX, innerY, sizeW, sizeH, radius);
         this.ctx.fillStyle = colors.main;
         this.ctx.fill();
+
         this.ctx.lineWidth = 1.8;
         this.ctx.strokeStyle = colors.border;
         this.ctx.stroke();
 
-        // Ojos
         const eyeSize = Math.max(2, Math.min(cellWidth, cellHeight) * 0.10);
 
-        let eyeY = y + cellHeight * 0.40;
-        let eyeX1 = x + cellWidth * 0.35;
-        let eyeX2 = x + cellWidth * 0.65;
-
-        if (snake.direction === 'UP') {
-            eyeY = y + cellHeight * 0.30;
-        }
-
-        if (snake.direction === 'DOWN') {
-            eyeY = y + cellHeight * 0.58;
-        }
-
-        if (snake.direction === 'LEFT') {
-            eyeX1 = x + cellWidth * 0.30;
-            eyeX2 = x + cellWidth * 0.30;
-            eyeY = y + cellHeight * 0.35;
-        }
-
-        if (snake.direction === 'RIGHT') {
-            eyeX1 = x + cellWidth * 0.70;
-            eyeX2 = x + cellWidth * 0.70;
-            eyeY = y + cellHeight * 0.35;
-        }
-
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = "#ffffff";
         this.ctx.beginPath();
-        this.ctx.arc(eyeX1, eyeY, eyeSize, 0, Math.PI * 2);
-        this.ctx.arc(eyeX2, eyeY + cellHeight * 0.18, eyeSize, 0, Math.PI * 2);
+        this.ctx.arc(x + cellWidth * 0.35, y + cellHeight * 0.40, eyeSize, 0, Math.PI * 2);
+        this.ctx.arc(x + cellWidth * 0.65, y + cellHeight * 0.40, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
 
-        this.ctx.fillStyle = '#111111';
+        this.ctx.fillStyle = "#111111";
         this.ctx.beginPath();
-        this.ctx.arc(eyeX1, eyeY, eyeSize * 0.45, 0, Math.PI * 2);
-        this.ctx.arc(eyeX2, eyeY + cellHeight * 0.18, eyeSize * 0.45, 0, Math.PI * 2);
+        this.ctx.arc(x + cellWidth * 0.37, y + cellHeight * 0.40, eyeSize * 0.45, 0, Math.PI * 2);
+        this.ctx.arc(x + cellWidth * 0.67, y + cellHeight * 0.40, eyeSize * 0.45, 0, Math.PI * 2);
         this.ctx.fill();
 
         this.ctx.restore();
     }
 
-    drawSnake(snake, cols, rows) {
-        const cellWidth = this.canvas.width / cols;
-        const cellHeight = this.canvas.height / rows;
+drawSnake(snake, cols, rows) {
+    const cellWidth = this.canvas.width / cols;
+    const cellHeight = this.canvas.height / rows;
 
-        snake.body.forEach((part, index) => {
-            const x = part.x * cellWidth;
-            const y = part.y * cellHeight;
+    for (let index = snake.body.length - 1; index >= 0; index--) {
+        const part = snake.body[index];
 
-            const isHead = index === 0;
+        const x = part.x * cellWidth;
+        const y = part.y * cellHeight;
 
-            if (!isHead) {
-                // Cuerpo mejorado con segmentos redondeados.
-                this.drawBodySegment(snake, x, y, cellWidth, cellHeight, index);
-            } else {
-                // También se dibuja una base debajo de la cabeza para que conecte con el cuerpo.
-                this.drawBodySegment(snake, x, y, cellWidth, cellHeight, index);
+        const bodyTextureLoaded = this.drawBodyTexture(
+            snake,
+            x,
+            y,
+            cellWidth,
+            cellHeight,
+            index
+        );
 
-                const spriteLoaded = this.drawHeadSprite(
-                    snake,
-                    x,
-                    y,
-                    cellWidth,
-                    cellHeight
-                );
+        if (!bodyTextureLoaded) {
+            this.drawBodySegment(snake, x, y, cellWidth, cellHeight, index);
+        }
 
-                if (!spriteLoaded) {
-                    this.drawFallbackHead(snake, x, y, cellWidth, cellHeight);
-                }
+        if (index === 0) {
+            const spriteLoaded = this.drawHeadSprite(
+                snake,
+                x,
+                y,
+                cellWidth,
+                cellHeight
+            );
+
+            if (!spriteLoaded) {
+                this.drawFallbackHead(snake, x, y, cellWidth, cellHeight);
             }
-        });
+        }
     }
+}
 
     drawFood(food, cols, rows) {
         const cellWidth = this.canvas.width / cols;
         const cellHeight = this.canvas.height / rows;
 
-        const type = food.type || 'pizza';
+        const type = food.type || "pizza";
         const image = this.foodImages[type];
 
         const x = food.x * cellWidth;
         const y = food.y * cellHeight;
 
-        // Halo visual alrededor de la comida
         this.ctx.save();
-        this.ctx.fillStyle = 'rgba(255, 215, 0, 0.22)';
+        this.ctx.fillStyle = "rgba(255, 215, 0, 0.22)";
         this.ctx.beginPath();
         this.ctx.arc(
             x + cellWidth / 2,
@@ -371,7 +669,7 @@ class Renderer {
         this.ctx.fill();
         this.ctx.restore();
 
-        if (image && image.complete) {
+        if (image && image.complete && image.naturalWidth > 0) {
             const size = Math.min(cellWidth, cellHeight) * 0.90;
 
             this.ctx.drawImage(
@@ -382,13 +680,12 @@ class Renderer {
                 size
             );
         } else {
-            // Respaldo con emoji si no carga el asset.
             this.ctx.font = `${Math.floor(Math.min(cellWidth, cellHeight) * 0.8)}px serif`;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "middle";
 
             this.ctx.fillText(
-                type === 'pizza' ? '🍕' : '🧉',
+                type === "pizza" ? "🍕" : "🧉",
                 x + cellWidth / 2,
                 y + cellHeight / 2
             );

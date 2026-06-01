@@ -1,25 +1,38 @@
 // audio.js — Sonidos del juego
-// Se usa una clase simple para centralizar todos los efectos de sonido.
+// Maneja los efectos de sonido del Snake Romano.
+
 class SoundManager {
     constructor() {
         this.enabled = true;
+
         this.sounds = {
-            eat: new Audio('assets/sounds/eat.wav'),
-            level: new Audio('assets/sounds/level.wav'),
-            gameover: new Audio('assets/sounds/gameover.wav'),
-            click: new Audio('assets/sounds/click.wav'),
+            eat: this.createAudio("assets/sounds/eat.mp3"),
+            eatArgentina: this.createAudio("assets/sounds/eat-argentina.mp3"),
+            level: this.createAudio("assets/sounds/level.mp3"),
+            gameover: this.createAudio("assets/sounds/gameover.mp3"),
+            click: this.createAudio("assets/sounds/click.mp3"),
+            turn: this.createAudio("assets/sounds/turn.mp3"),
         };
     }
 
-    play(name) {
-        if (!this.enabled || !this.sounds[name]) return;
+    createAudio(src) {
+        const audio = new Audio(src);
+        audio.preload = "auto";
+        audio.volume = 0.45;
+        return audio;
+    }
 
-        // Se reinicia el audio para poder repetir sonidos rápidamente.
+    play(name) {
+        if (!this.enabled) return;
+
         const sound = this.sounds[name];
+
+        if (!sound) return;
+
         sound.currentTime = 0;
+
         sound.play().catch(() => {
-            // Algunos navegadores bloquean audio hasta que el usuario toque un botón.
-            // No se muestra error porque no afecta el funcionamiento del juego.
+            // El navegador puede bloquear sonidos hasta que el usuario interactúe.
         });
     }
 

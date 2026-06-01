@@ -528,3 +528,111 @@ header p {
         height: 48px;
     }
 }
+/* ============================= */
+/* INPUTS DE NOMBRES DE JUGADOR */
+/* ============================= */
+
+.name-config {
+    width: min(100%, 520px);
+    margin: 22px auto 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.name-field {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-field label {
+    color: var(--gold);
+    font-family: "Cinzel", serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.35);
+}
+
+.name-field input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 215, 0, 0.75);
+    background: rgba(31, 21, 10, 0.92);
+    color: var(--gold);
+    font-family: "Cinzel", serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    outline: none;
+    box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 0.55),
+        0 0 10px rgba(255, 215, 0, 0.18);
+    transition: 0.2s ease;
+}
+
+.name-field input::placeholder {
+    color: rgba(255, 215, 0, 0.45);
+}
+
+.name-field input:focus {
+    border-color: #ffe766;
+    background: rgba(46, 31, 14, 0.96);
+    color: #ffe766;
+    box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 0.55),
+        0 0 14px rgba(255, 215, 0, 0.45);
+    transform: scale(1.015);
+}
+
+/* Responsive */
+@media (max-width: 650px) {
+    .name-config {
+        width: 92%;
+        margin: 16px auto;
+    }
+
+    .name-field {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        text-align: left;
+    }
+
+    .name-field label {
+        font-size: 0.78rem;
+    }
+
+    .name-field input {
+        font-size: 0.85rem;
+        padding: 9px 12px;
+    }
+}
+.name-field input:hover {
+    border-color: #ffd700;
+    box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 0.55),
+        0 0 16px rgba(255, 215, 0, 0.35);
+}
+
+/* Oculta la barra deslizadora del menú/overlays */
+.overlay {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.overlay::-webkit-scrollbar {
+    display: none;
+}
+
+/* Botón de limpiar ranking arriba de la lista */
+.ranking-clear-btn {
+    display: block;
+    margin: 0 auto 12px;
+}
+
+.compact-ranking .ranking-clear-btn {
+    margin-bottom: 10px;
+}
