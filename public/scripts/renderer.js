@@ -41,8 +41,8 @@ class Renderer {
 
         /*
             Curvas Italia:
-            Están cruzadas a propósito porque visualmente algunas imágenes
-            pueden venir rotadas o con orientación distinta.
+            Están cruzadas porque tus imágenes están orientadas de esa forma.
+            Si alguna curva queda al revés, solo se cambia la ruta del PNG.
         */
         this.snakeBodies[1].curveLeftUp.src = "assets/sprites/italia-curve-l-down.png";
         this.snakeBodies[1].curveLeftDown.src = "assets/sprites/italia-curve-l-up.png";
@@ -53,11 +53,6 @@ class Renderer {
         this.snakeBodies[2].horizontal.src = "assets/sprites/argentinacuerpo.png";
         this.snakeBodies[2].vertical.src = "assets/sprites/argentinacuerpovertical.png";
 
-        /*
-            Curvas Argentina:
-            Si podés, renombrá el archivo largo a algo más limpio como:
-            argentina-curve-l-down.png
-        */
         this.snakeBodies[2].curveLeftUp.src = "assets/sprites/_E0E5DBFA-AF69-43CE-8AE9-F9C4E46EA1FB_-removebg-preview.png";
         this.snakeBodies[2].curveLeftDown.src = "assets/sprites/argentina-curve-l-up.png";
         this.snakeBodies[2].curveRightUp.src = "assets/sprites/argentina-curve-r-down.png";
@@ -244,51 +239,52 @@ class Renderer {
 
     getBodyTransform(spriteKey, cellWidth, cellHeight) {
         /*
-            Ajustes visuales de tamaño y posición.
-            Si alguna curva queda corrida, tocá solamente su offsetX u offsetY.
+            Tamaño visual del cuerpo.
+            Antes estaba cerca de 1.04 / 1.10.
+            Ahora está más grande para que el cuerpo llene mejor la celda.
         */
 
         const transforms = {
             horizontal: {
-                width: cellWidth * 1.04,
-                height: cellHeight * 1.04,
-                offsetX: -cellWidth * 0.02,
-                offsetY: -cellHeight * 0.02,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
 
             vertical: {
-                width: cellWidth * 1.04,
-                height: cellHeight * 1.04,
-                offsetX: -cellWidth * 0.02,
-                offsetY: -cellHeight * 0.02,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
 
             curveLeftUp: {
-                width: cellWidth * 1.10,
-                height: cellHeight * 1.10,
-                offsetX: -cellWidth * 0.05,
-                offsetY: -cellHeight * 0.05,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
 
             curveLeftDown: {
-                width: cellWidth * 1.10,
-                height: cellHeight * 1.10,
-                offsetX: -cellWidth * 0.05,
-                offsetY: -cellHeight * 0.01,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
 
             curveRightUp: {
-                width: cellWidth * 1.10,
-                height: cellHeight * 1.10,
-                offsetX: -cellWidth * 0.01,
-                offsetY: -cellHeight * 0.05,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
 
             curveRightDown: {
-                width: cellWidth * 1.10,
-                height: cellHeight * 1.10,
-                offsetX: -cellWidth * 0.01,
-                offsetY: -cellHeight * 0.01,
+                width: cellWidth * 1.35,
+                height: cellHeight * 1.35,
+                offsetX: -cellWidth * 0.175,
+                offsetY: -cellHeight * 0.175,
             },
         };
 
@@ -327,8 +323,8 @@ class Renderer {
     drawBodySegment(snake, x, y, cellWidth, cellHeight, index) {
         const colors = this.getSnakeColors(snake);
 
-        const sizeW = cellWidth * 0.82;
-        const sizeH = cellHeight * 0.82;
+        const sizeW = cellWidth * 0.95;
+        const sizeH = cellHeight * 0.95;
 
         const innerX = x + (cellWidth - sizeW) / 2;
         const innerY = y + (cellHeight - sizeH) / 2;
@@ -414,7 +410,12 @@ class Renderer {
         const isEating = snake.eatingTimer && snake.eatingTimer > 0;
         const baseSize = Math.min(cellWidth, cellHeight);
 
-        const size = isEating ? baseSize * 1.65 : baseSize * 1.38;
+        /*
+            Cabeza más grande.
+            Normal: 1.50
+            Comiendo: 1.75
+        */
+        const size = isEating ? baseSize * 1.75 : baseSize * 1.50;
 
         const centerX = x + cellWidth / 2;
         const centerY = y + cellHeight / 2;
@@ -422,10 +423,10 @@ class Renderer {
         let offsetX = 0;
         let offsetY = 0;
 
-        if (direction === "UP") offsetY = -cellHeight * 0.14;
-        if (direction === "DOWN") offsetY = cellHeight * 0.14;
-        if (direction === "LEFT") offsetX = -cellWidth * 0.14;
-        if (direction === "RIGHT") offsetX = cellWidth * 0.14;
+        if (direction === "UP") offsetY = -cellHeight * 0.16;
+        if (direction === "DOWN") offsetY = cellHeight * 0.16;
+        if (direction === "LEFT") offsetX = -cellWidth * 0.16;
+        if (direction === "RIGHT") offsetX = cellWidth * 0.16;
 
         this.ctx.save();
 
@@ -449,8 +450,8 @@ class Renderer {
     drawFallbackHead(snake, x, y, cellWidth, cellHeight) {
         const colors = this.getSnakeColors(snake);
 
-        const sizeW = cellWidth * 0.88;
-        const sizeH = cellHeight * 0.88;
+        const sizeW = cellWidth * 1.05;
+        const sizeH = cellHeight * 1.05;
 
         const innerX = x + (cellWidth - sizeW) / 2;
         const innerY = y + (cellHeight - sizeH) / 2;
